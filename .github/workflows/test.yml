@@ -1,21 +1,32 @@
 name: Test
 on:
-  - push
+  push:
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Install modules
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
         run: npm install
 
-      - name: Install codecov
-        run: npm install -g codecov
+      - name: Lint
+        run: npm run lint
 
       - name: Test
-        run: npm run ci
+        run: npm run test:ci
 
-      - name: Test build
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+
+      - name: Build
         run: npm run build

@@ -25,16 +25,34 @@ yarn add @neaps/tide-predictor
 
 ```
 
+> [!NOTE]
+> Tide Predictor requires Node.js 18 or newer and is published as an ECMAScript module.
+
+## Development
+
+```bash
+npm install
+npm run build
+npm run test
+```
+
+Live integration checks against NOAA's API are skipped by default. Set `NOAA_LIVE_TESTS=true` when running the Vitest suite to execute them.
+
 ## Importing
 
-You can import the module using Ecmascript, or CommonJS. Note that the CommonJS export is transpiled, so deep debugging the module that way will be difficult.
+You can import the module as a standard ECMAScript module:
 
 ```js
 import TidePredictor from '@neaps/tide-predictor'
-const TidePredictor = require('@neaps/tide-predictor')
 ```
 
-There are also packaged and minified versions for the browser in `dist/web`.
+If you need to load the library from a CommonJS environment, use a dynamic `import()` call:
+
+```js
+const { default: TidePredictor } = await import('@neaps/tide-predictor')
+```
+
+The published package ships an optimized ESM build. Modern bundlers can consume it directly for browser usage.
 
 # Usage
 
