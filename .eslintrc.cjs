@@ -1,18 +1,19 @@
 module.exports = {
+  root: true,
   env: {
-    browser: true,
-    es2021: true,
+    es2022: true,
     node: true
   },
-  extends: 'eslint:recommended',
+  extends: ['eslint:recommended', 'prettier'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
-  rules: {
-    indent: ['error', 2],
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'single'],
-    semi: ['error', 'never']
-  }
+  overrides: [
+    {
+      files: ['test/**/*.js'],
+      plugins: ['@vitest'],
+      extends: ['plugin:@vitest/legacy-recommended']
+    }
+  ]
 }

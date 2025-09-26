@@ -5,3 +5,4 @@ junit.xml
 .test-cache
 .DS_Store
 .nyc_output
+dist/*.map

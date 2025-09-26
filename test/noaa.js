@@ -9,6 +9,13 @@ if (!fs.existsSync('./.test-cache')) {
 }
 
 const stations = ['9413450', '9411340', '2695535', '8761724', '8410140']
+const runLiveTests = process.env.NOAA_LIVE_TESTS === 'true'
+const describeLive = runLiveTests ? describe : describe.skip
+
+const getStationAsync = (station) =>
+  new Promise((resolve) => {
+    getStation(station, resolve)
+  })
 
 const makeRequest = (url) =>
   new Promise((resolve, reject) => {
@@ -78,10 +85,13 @@ const getStation = (station, callback) => {
   })
 }
 
-describe('Results compare to NOAA', () => {
+describeLive('Results compare to NOAA', () => {
   stations.forEach((station) => {
-    it(`it compares with station ${station}`, (done) => {
-      getStation(station, ({ harmonics, levels, info }) => {
+    it(
+      `it compares with station ${station}`,
+      async () => {
+        const { harmonics, levels, info } = await getStationAsync(station)
+
         let mtl = 0
         let mllw = 0
         info.datums.forEach((datum) => {
@@ -92,10 +102,12 @@ describe('Results compare to NOAA', () => {
             mllw = datum.value
           }
         })
+
         const tideStation = tidePrediction(
           harmonics.HarmonicConstituents,
           mtl - mllw
         )
+
         levels.predictions.forEach((prediction) => {
           const neapsPrediction = tideStation.getWaterLevelAtTime({
             time: new Date(prediction.t)
@@ -103,8 +115,8 @@ describe('Results compare to NOAA', () => {
           assert.ok(parseFloat(prediction.v) >= neapsPrediction.level - 0.5)
           assert.ok(parseFloat(prediction.v) <= neapsPrediction.level + 0.5)
         })
-        done()
-      })
-    }).timeout(20000)
+      },
+      20000
+    )
   })
 })
